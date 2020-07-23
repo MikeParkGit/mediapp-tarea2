@@ -1,0 +1,64 @@
+<mat-toolbar>Registro de venta</mat-toolbar>
+<form class="example-container" [formGroup]="forma" (ngSubmit)="registrar()" #vtaForm="ngForm">
+
+    <mat-form-field>
+        <mat-select placeholder="Vendedor" [(value)] = "personaSeleccionada" formControlName="persona">
+            <mat-option *ngFor="let p of personas" [value]="p">
+                {{p.apellidos}} {{p.nombres}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput [matDatepicker] = "picker" placeholder="Elige una fecha" [max]="maxFecha" 
+                    formControlName="fecha" [(ngModel)] ="fechaSeleccionada">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="Importe" [(ngModel)]="importe" formControlName="importe">
+    </mat-form-field> 
+    <!-- Inicia detalle -->
+    <mat-form-field>
+        <input type="text" placeholder="Producto" matInput [matAutocomplete] = "autoProducto"
+            [formControl]="myCtrlProducto" formControlName="producto">
+        <mat-autocomplete #autoProducto="matAutocomplete" [displayWith] = "mostrarProducto" (optionSelected)="seleccionarProducto($event)">
+            <mat-option *ngFor = "let p of productosFiltrados | async" [value] = "p">
+                {{p.nombre}} {{p.marca}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="Cantidad" [(ngModel)]="cantidad" formControlName="cantidad">
+    </mat-form-field> 
+    <button mat-raised-button color="primary" type="button" (click)="agregarDetalle()">Agregar detalle</button>
+
+    <mat-table [dataSource]= "detalleVentaArreglo" matTable>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+        <ng-container matColumnDef="producto">
+            <mat-header-cell *matHeaderCellDef > Producto </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.producto.nombre}} </mat-cell>
+          </ng-container>
+  
+          <ng-container matColumnDef="cantidad">
+            <mat-header-cell *matHeaderCellDef > Cantidad </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.cantidad}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <button mat-rised-button color="warn" type="button" (click) = "eliminarDetalle(row)">Remover</button>
+            </mat-cell>
+        </ng-container>
+
+          
+
+    </mat-table>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="estadoBotonRegistrar()" >Registrar</button>
+</form>
